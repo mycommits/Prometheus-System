@@ -1,0 +1,8 @@
+---
+# tasks file for prometheus
+- include: selinux.yml
+- include: firewalld.yml
+- include: prometheus.yml
+- include: alert_manager.yml
+- include: grafana.yml
+- include: node_exporter.yml

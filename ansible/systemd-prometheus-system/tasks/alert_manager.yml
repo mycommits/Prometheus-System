@@ -1,0 +1,70 @@
+---
+- name: Create a user for alert manager systemd service
+  user:
+    name: alertmanager
+    create_home: no
+    shell: /bin/false
+    state: present
+    comment: "This user created to serve as a systemd user and no login authorized."
+
+- name: Create the service paths
+  file:
+    path: "/etc/alertmanager"
+    state: directory
+    owner: alertmanager
+    group: alertmanager
+    mode: 0775
+
+- name: Download the alertmanager source
+  unarchive:
+    src: https://github.com/prometheus/alertmanager/releases/download/v0.21.0/alertmanager-0.21.0.linux-amd64.tar.gz
+    dest: /tmp/
+    owner: alertmanager
+    group: alertmanager
+    remote_src: yes
+
+- name: Setup the alertmanager file
+  copy:
+    src: /tmp/alertmanager-0.21.0.linux-amd64/alertmanager
+    dest: /usr/local/bin
+    owner: alertmanager
+    group: alertmanager
+    mode: 0755
+    remote_src: yes
+
+- name: Setup the amtool file
+  copy:
+    src: /tmp/alertmanager-0.21.0.linux-amd64/amtool
+    dest: /usr/local/bin
+    owner: alertmanager
+    group: alertmanager
+    mode: 0755
+    remote_src: yes
+
+- name: Setup the alertmanager.yml file
+  copy:
+    src: /tmp/alertmanager-0.21.0.linux-amd64/alertmanager.yml
+    dest: /etc/alertmanager
+    owner: alertmanager
+    group: alertmanager
+    remote_src: yes
+
+- name: Create systemd service for the AlertManager
+  template:
+    src: alertmanager.service.js
+    dest: /etc/systemd/system/alertmanager.service
+    owner: root
+    group: root
+    mode: 0755
+
+- name: start the alertmanager systemd service
+  systemd:
+    name: alertmanager
+    daemon_reload: yes
+    state: started
+    enabled: yes
+
+- name: Remove the temporary download path
+  file:
+    path: /tmp/alertmanager-0.21.0.linux-amd64
+    state: absent

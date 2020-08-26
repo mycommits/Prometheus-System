@@ -1,0 +1,28 @@
+---
+- name: Enable the Prometheus port
+  firewalld:
+    port: "9090/tcp"
+    state: enabled
+    permanent: yes
+    immediate: yes
+
+- name: Enable the Alert Manager port
+  firewalld:
+    port: "9093/tcp"
+    state: enabled
+    permanent: yes
+    immediate: yes
+
+- name: Enable the Grafana port
+  firewalld:
+    port: "3000/tcp"
+    state: enabled
+    permanent: yes
+    immediate: yes
+
+- name: Enable the Node Exporter port
+  firewalld:
+    port: "9100/tcp"
+    state: enabled
+    permanent: yes
+    immediate: yes

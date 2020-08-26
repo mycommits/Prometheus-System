@@ -1,0 +1,45 @@
+---
+- name: Create a user for Node Exporter systemd service
+  user:
+    name: node_exporter
+    create_home: no
+    shell: /bin/false
+    state: present
+    comment: "This user created to serve as a systemd user and no login authorized."
+
+- name: Download the Node Exporter source
+  unarchive:
+    src: https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
+    dest: /tmp/
+    owner: node_exporter
+    group: node_exporter
+    remote_src: yes
+
+- name: Setup the Node Exporter node_exporter file
+  copy:
+    src: /tmp/node_exporter-1.0.1.linux-amd64/node_exporter
+    dest: /usr/local/bin
+    owner: prometheus
+    group: prometheus
+    mode: 0755
+    remote_src: yes
+
+- name: Create systemd service for the Node Exporter
+  template:
+    src: node_exporter.service.js
+    dest: /etc/systemd/system/node_exporter.service
+    owner: root
+    group: root
+    mode: 0755
+
+- name: start the Node Exporter systemd service
+  systemd:
+    name: node_exporter
+    daemon_reload: yes
+    state: started
+    enabled: yes
+
+- name: Remove the temporary download path
+  file:
+    path: /tmp/node_exporter-1.0.1.linux-amd64/
+    state: absent
