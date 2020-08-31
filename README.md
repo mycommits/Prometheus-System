@@ -180,6 +180,61 @@ sudo vim /etc/prometheus/prometheus.yml
 ```
 sudo systemctl restart prometheus
 ```
+
+# Apache Exporter
+## Installation
+1.Create a system user:
+```
+sudo useradd -M -r -s /bin/false apache_exporter
+```
+2.Download the Apache Exporter from [Prometheus downloads page:](https://prometheus.io/download/)
+```
+cd /tmp/
+wget https://github.com/Lusitaniae/apache_exporter/releases/download/v0.7.0/apache_exporter-0.7.0.linux-amd64.tar.gz
+```
+3.Extract its contents; note that the versioning of the Apache Exporter may be different:
+```
+tar xvfz apache_exporter-0.7.0.linux-amd64.tar.gz
+```
+4.Move into the newly created directory:
+```
+cd apache_exporter-0.7.0.linux-amd64
+```
+5.Move the provided binary:
+```
+sudo mv apache_exporter /usr/local/bin/
+```
+6.Set the ownership:
+```
+sudo chown apache_exporter:apache_exporter /usr/local/bin/apache_exporter
+```
+7.Create a systemd [service file:](./apache_exporter.service)
+```
+sudo vim /etc/systemd/system/apache_exporter.service
+```
+8.Start the Apache Exporter:
+```
+sudo systemctl daemon-reload
+sudo systemctl start apache_exporter
+```
+9.Make sure Apache Exporter is working:
+```
+sudo systemctl status apache_exporter
+curl localhost:9117/metrics
+```
+10.Add the endpoint to the Prometheus configuration file:
+```
+sudo vim /etc/prometheus/prometheus.yml
+
+- job_name: 'Apache'
+    static_configs:
+    - targets: ['localhost:9117']
+```
+11.Restart Prometheus:
+```
+sudo systemctl restart prometheus
+```
+
 ## Stress Test
 1.Navigate to the Prometheus web UI.
 Using the expression editor, search for cpu, meminfo, and related system terms to view the newly added metrics.
