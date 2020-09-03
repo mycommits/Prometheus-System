@@ -73,13 +73,11 @@ tar xzvf alertmanager-0.21.0.linux-amd64.tar.gz
 5.Move the binaries:
 ```
 cd alertmanager-0.21.0.linux-amd64/
-sudo mv alertmanager /usr/local/bin/
-sudo mv amtool /usr/local/bin/
+sudo mv {alertmanager,amtool} /usr/local/bin/
 ```
 6.Set the ownership of the binaries:
 ```
-sudo chown alertmanager:alertmanager /usr/local/bin/alertmanager
-sudo chown alertmanager:alertmanager /usr/local/bin/amtool
+sudo chown alertmanager:alertmanager /usr/local/bin/{alertmanager,amtool}
 ```
 7.Move the configuration file into the /etc/alertmanager directory:
 ```
@@ -115,6 +113,10 @@ sudo systemctl start alertmanager
 sudo systemctl enable alertmanager
 ```
 13.Visit YourIP:9093 in your browser to confirm Alertmanager is working.
+14.Verify amtool is able to connect to Alertmanager and retrieve the current configuration:
+```
+amtool config show --alertmanager.url=http://localhost:9093
+```
 
 # Grafana
 ## Installation
