@@ -289,3 +289,92 @@ sudo vim /etc/prometheus/prometheus.yml
 ```
 sudo systemctl restart prometheus
 ```
+
+# Docker Engine
+## Configure the Docker Daemon to Serve Prometheus Metrics
+1.Edit the Docker config file:
+```
+sudo vi /etc/docker/daemon.json
+```
+2.Add configuration to enable experimental mode and set the metrics address:
+```
+{
+  "experimental": true,
+  "metrics-addr": "<PRIVATE_IP>:9323"
+}
+```
+3.Restart Docker to load the new configuration:
+```
+sudo systemctl restart docker
+```
+4.Verify Docker is serving Prometheus metrics:
+```
+curl <PRIVATE_IP>:9323/metrics
+```
+5.Edit the Prometheus config:
+```
+sudo vi /etc/prometheus/prometheus.yml
+```
+6.Under the scrape_configs section, add a scrape configuration for Docker:
+```
+- job_name: 'Docker'
+  static_configs:
+  - targets: ['<PRIVATE_IP>:9323']
+```
+7.Restart Prometheus to load the new configuration:
+```
+sudo systemctl restart prometheus
+```
+
+# Kubernetes
+#### Set Up `kube-state-metrics` to Expose Metrics for Your Kubernetes Cluster
+1.Install kube-state-metrics:
+```
+git clone https://github.com/kubernetes/kube-state-metrics.git
+cd kube-state-metrics/
+git checkout v1.8.0
+kubectl apply -f kubernetes
+```
+2.Create a NodePort service to expose the metrics service outside the cluster, making it accessible to the Prometheus server:
+```
+cd ..
+cat << EOF > kube-state-metrics-nodeport-svc.yml
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: kube-system
+  name: kube-state-nodeport
+spec:
+  selector:
+    k8s-app: kube-state-metrics
+  ports:
+  - protocol: TCP
+    port: 8080
+    nodePort: 30000
+  type: NodePort
+EOF
+```
+3.Create the NodePort service and test it:
+```
+kubectl apply -f kube-state-metrics-nodeport-svc.yml
+curl localhost:30000/metrics
+```
+#### Configure Prometheus to Scrape Metrics from `kube-state-metrics`
+1.Edit the Prometheus config:
+```
+sudo vi /etc/prometheus/prometheus.yml
+```
+2.Under the scrape_configs section, add a scrape configuration for Kubernetes:
+```
+- job_name: 'Kubernetes'
+  static_configs:
+  - targets: ['limedrop-kube:30000']
+```
+3.Restart Prometheus to load the new configuration:
+```
+sudo systemctl restart prometheus
+```
+4.Use the expression browser to verify you can see Kubernetes metrics in Prometheus. You can access the expression browser in a web browser at http://<PROMETHEUS_SERVER_PUBLIC_IP>:9090. Run a query to view some Kubernetes metric data:
+```
+kube_pod_status_ready{namespace="default",condition="true"}
+```
