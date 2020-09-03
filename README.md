@@ -378,3 +378,59 @@ sudo systemctl restart prometheus
 ```
 kube_pod_status_ready{namespace="default",condition="true"}
 ```
+
+# PUSHGATEWAY
+## Installation
+1.Create a system user:
+```
+sudo useradd -M -r -s /bin/false pushgateway
+```
+2.Download the PushGateway from [Prometheus downloads page:](https://prometheus.io/download/)
+```
+cd /tmp/
+wget https://github.com/prometheus/pushgateway/releases/download/v1.2.0/pushgateway-1.2.0.linux-amd64.tar.gz
+```
+3.Extract its contents; note that the versioning of the PushGateway may be different:
+```
+tar xvfz pushgateway-1.2.0.linux-amd64.tar.gz
+```
+4.Move into the newly created directory:
+```
+cd pushgateway-1.2.0.linux-amd64/
+```
+5.Move the provided binary:
+```
+sudo cp pushgateway /usr/local/bin/
+```
+6.Set the ownership:
+```
+sudo chown pushgateway:pushgateway /usr/local/bin/pushgateway
+```
+7.Create a systemd [service file:](./pushgateway.service)
+```
+sudo vi /etc/systemd/system/pushgateway.service
+```
+8.Start the PushGateway:
+```
+sudo systemctl daemon-reload
+sudo systemctl enable pushgateway
+sudo systemctl start pushgateway
+```
+9.Make sure PushGateway is working:
+```
+sudo systemctl status pushgateway
+curl localhost:9091/metrics
+```
+10.Add the endpoint to the Prometheus configuration file:
+```
+sudo vim /etc/prometheus/prometheus.yml
+
+- job_name: 'Pushgateway'
+    honor_labels: true
+    static_configs:
+    - targets: ['<PushGatewayIP>:9091']
+```
+11.Restart Prometheus:
+```
+sudo systemctl restart prometheus
+```
