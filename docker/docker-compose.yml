@@ -58,7 +58,7 @@ services:
       org.label-schema.group: "monitoring"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: google/cadvisor:latest
     restart: always
     container_name: cadvisor
     volumes:
