@@ -98,7 +98,7 @@ The Docker Containers Dashboard shows key metrics for monitoring running contain
 
 Note that this dashboard doesn't show the containers that are part of the monitoring stack.
 
-***Monitor Services Dashboard***
+***Monitor Services Dashboard*** 
 
 ![Monitor Services](./pics/Grafana_Prometheus.png)
 
