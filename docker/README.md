@@ -115,7 +115,7 @@ The Monitor Services Dashboard shows key metrics for monitoring the containers t
 
 ## Define alerts
 
-Three alert groups have been setup within the [alert.rules](./prometheus/alert.rules) configuration file:
+Three alert groups have been setup within the [alert.rules](https://github.com/mohammadhoseinchahardoli/Promatheus-System/blob/develop/docker/prometheus/alert.rules) configuration file:
 
 * Monitoring services alerts [targets](https://github.com/mohammadhoseinchahardoli/Promatheus-System/blob/develop/docker/prometheus/alert.rules#L2-L11)
 * Docker Host alerts [host](https://github.com/mohammadhoseinchahardoli/Promatheus-System/blob/develop/docker/prometheus/alert.rules#L13-L40)
@@ -234,7 +234,7 @@ A complete list of integrations can be found [here](https://prometheus.io/docs/a
 
 You can view and silence notifications by accessing `http://<host-ip>:9093`.
 
-The notification receivers can be configured in [alertmanager/config.yml](https://github.com/mohammadhoseinchahardoli/Promehteus-System/blob/develop/alertmanager/config.yml) file.
+The notification receivers can be configured in [alertmanager/config.yml](https://github.com/mohammadhoseinchahardoli/Promatheus-System/blob/develop/docker/alertmanager/config.yml) file.
 
 To receive alerts via Slack you need to make a custom integration by choose ***incoming web hooks*** in your Slack team app page.
 You can find more details on setting up Slack integration [here](http://www.robustperception.io/using-slack-with-the-alertmanager/).
