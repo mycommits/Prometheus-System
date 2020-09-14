@@ -255,7 +255,7 @@ receivers:
             api_url: 'https://hooks.slack.com/services/<webhook-id>'
 ```
 
-![Slack Notifications](https://raw.githubusercontent.com/mohammadhoseinchahardoli/Prometheus-System/develop/pics/Slack_Notifications.png)
+![Slack Notifications](./pics/Slack_Notifications.png)
 
 ## Sending metrics to the Pushgateway
 
