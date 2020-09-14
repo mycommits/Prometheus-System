@@ -98,7 +98,7 @@ The Docker Containers Dashboard shows key metrics for monitoring running contain
 
 Note that this dashboard doesn't show the containers that are part of the monitoring stack.
 
-***Monitor Services Dashboard*** 
+***Monitor Services Dashboard***
 
 ![Monitor Services](./pics/Grafana_Prometheus.png)
 
@@ -117,9 +117,9 @@ The Monitor Services Dashboard shows key metrics for monitoring the containers t
 
 Three alert groups have been setup within the [alert.rules](./prometheus/alert.rules) configuration file:
 
-* Monitoring services alerts [targets](https://github.com/mohammadhoseinchahardoli/Prometheus-System/blob/develop/prometheus/alert.rules#L2-L11)
-* Docker Host alerts [host](https://github.com/mohammadhoseinchahardoli/Prometheus-System/blob/develop/prometheus/alert.rules#L13-L40)
-* Docker Containers alerts [containers](https://github.com/mohammadhoseinchahardoli/Prometheus-System/blob/develop/prometheus/alert.rules#L42-L69)
+* Monitoring services alerts [targets](https://github.com/mohammadhoseinchahardoli/Promatheus-System/blob/develop/docker/prometheus/alert.rules#L2-L11)
+* Docker Host alerts [host](https://github.com/mohammadhoseinchahardoli/Promatheus-System/blob/develop/docker/prometheus/alert.rules#L13-L40)
+* Docker Containers alerts [containers](https://github.com/mohammadhoseinchahardoli/Promatheus-System/blob/develop/docker/prometheus/alert.rules#L42-L69)
 
 You can modify the alert rules and reload them by making a HTTP POST call to Prometheus:
 
