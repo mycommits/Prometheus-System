@@ -1,0 +1,9 @@
+groups:
+  - name: WebServer
+    rules:
+      - alert: WebServerDown
+        expr: up{job="Web Server"} == 0
+        labels:
+          severity: critical
+        annotations:
+          summary: Web Server Down

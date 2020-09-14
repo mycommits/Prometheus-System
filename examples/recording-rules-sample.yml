@@ -1,0 +1,6 @@
+groups:
+  - name: WebServer
+    interval: 15s
+    rules:
+      - record: WebServer:cpu_usage
+        expr: sum(rate(node_cpu_seconds_total{job="WebServer",mode!='idle'}[5m])) * 100 / 2
