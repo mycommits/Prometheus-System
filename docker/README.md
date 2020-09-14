@@ -4,7 +4,7 @@ Prometheus System
 A monitoring solution for Docker hosts and containers with [Prometheus](https://prometheus.io/), [Grafana](http://grafana.org/), [cAdvisor](https://github.com/google/cadvisor),
 [NodeExporter](https://github.com/prometheus/node_exporter) and alerting with [AlertManager](https://github.com/prometheus/alertmanager).
 
-##Quick Start
+## Quick Start
 
 Clone this repository on your Docker host, cd into Prometheus-System/docker directory and run compose up:
 
@@ -115,7 +115,7 @@ The Monitor Services Dashboard shows key metrics for monitoring the containers t
 
 ## Define alerts
 
-Three alert groups have been setup within the [alert.rules](https://github.com/mohammadhoseinchahardoli/Prometheus-System/blob/develop/prometheus/alert.rules) configuration file:
+Three alert groups have been setup within the [alert.rules](./prometheus/alert.rules) configuration file:
 
 * Monitoring services alerts [targets](https://github.com/mohammadhoseinchahardoli/Prometheus-System/blob/develop/prometheus/alert.rules#L2-L11)
 * Docker Host alerts [host](https://github.com/mohammadhoseinchahardoli/Prometheus-System/blob/develop/prometheus/alert.rules#L13-L40)
