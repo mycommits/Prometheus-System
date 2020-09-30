@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Maintainer Mohammad Hosein Chahardoli <mohammadhoseinchahardoli@gmail.com>
-wget -h || yum install -y wget
+wget -h 1>/dev/null 2>&1 || yum install -y wget
 function prometheus_install() {
     sudo useradd -M -r -s /bin/false prometheus
     sudo mkdir -p {/etc/prometheus,/var/lib/prometheus}
