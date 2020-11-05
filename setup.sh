@@ -6,7 +6,8 @@ function prometheus_install() {
     sudo mkdir -p {/etc/prometheus,/var/lib/prometheus}
     sudo chown prometheus:prometheus /var/lib/prometheus
     cd /tmp
-    wget https://github.com/prometheus/prometheus/releases/download/v2.20.1/prometheus-2.20.1.linux-amd64.tar.gz
+    VERSION=$(curl https://raw.githubusercontent.com/prometheus/prometheus/master/VERSION)
+    wget https://github.com/prometheus/prometheus/releases/download/v${VERSION}/prometheus-${VERSION}.linux-amd64.tar.gz
     tar xzvf prometheus-2.20.1.linux-amd64.tar.gz
     cd prometheus-2.20.1.linux-amd64
     sudo mv {consoles,console_libraries,prometheus.yml} /etc/prometheus
