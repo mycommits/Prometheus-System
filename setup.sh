@@ -2,7 +2,8 @@
 # Maintainer Mohammad Hosein Chahardoli <mohammadhoseinchahardoli@gmail.com>
 wget -h 1>/dev/null 2>&1 || yum install -y wget
 function prometheus_install() {
-    sudo useradd --no-create-home --disabled-login --shell /bin/false --gecos "Prometheus Monitoring User" --system prometheus
+    sudo useradd --no-create-home --shell /bin/false --comment "Prometheus Monitoring User" --system prometheus
+    sudo passwd -l prometheus
     sudo mkdir -p {/etc/prometheus,/var/lib/prometheus}
     sudo chown prometheus:prometheus /var/lib/prometheus
     cd /tmp
@@ -42,7 +43,8 @@ EOF
     echo -e "\nThis script doesn't configure SElinux. Please configure SElinux manually."
 }
 function alertmanager_install() {
-    sudo useradd --no-create-home --disabled-login --shell /bin/false --gecos "Alertmanager User" --system alertmanager
+    sudo useradd --no-create-home --shell /bin/false --comment "Alertmanager User" --system alertmanager
+    sudo passwd -l alertmanager
     sudo mkdir /etc/alertmanager
     cd /tmp/
     VERSION=$(curl https://raw.githubusercontent.com/prometheus/alertmanager/master/VERSION)
@@ -83,19 +85,20 @@ EOF
     amtool config show
     sudo rm -rf /tmp/{alertmanager-${VERSION}.linux-amd64.tar.gz,alertmanager-${VERSION}.linux-amd64}
     firewall-cmd --add-port=9093/tcp --permanent || echo -e "\nfirewall-cmd not available!\nPlease configure linux firewall manually." && firewall-cmd --reload
+    firewall-cmd --add-port=9094/tcp --permanent || echo -e "\nfirewall-cmd not available!\nPlease configure linux firewall manually." && firewall-cmd --reload
     echo -e "\nThis script doesn't configure SElinux. Please configure SElinux manually."
 }
 function grafana_install() {
-    cat << EOF > /etc/yum/repos.d/grafana.repo
+    cat << EOF > /etc/yum.repos.d/grafana.repo
 [grafana]
- name=grafana
- baseurl=https://packagecloud.io/grafana/stable/el/7/$basearch
- repo_gpgcheck=1
- enabled=1
- gpgcheck=1
- gpgkey=https://packagecloud.io/gpg.key https://grafanarel.s3.amazonaws.com/RPM-GPG-KEY-grafana
- sslverify=1
- sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+name=grafana
+baseurl=https://packages.grafana.com/oss/rpm
+repo_gpgcheck=1
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.grafana.com/gpg.key
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 EOF
     sudo yum install -y grafana
     sudo systemctl daemon-reload
@@ -104,7 +107,8 @@ EOF
     echo -e "\nThis script doesn't configure SElinux. Please configure SElinux manually."
 }
 function nodeexporter_install() {
-    sudo useradd --no-create-home --disabled-login --shell /bin/false --gecos "Node Exporter User" --system node_exporter
+    sudo useradd --no-create-home --shell /bin/false --comment "Node Exporter User" --system node_exporter
+    sudo passwd -l node_exporter
     cd /tmp/
     VERSION=$(curl https://raw.githubusercontent.com/prometheus/node_exporter/master/VERSION)
     wget https://github.com/prometheus/node_exporter/releases/download/v${VERSION}/node_exporter-${VERSION}.linux-amd64.tar.gz
@@ -135,7 +139,8 @@ EOF
     echo -e "\nThis script doesn't configure SElinux. Please configure SElinux manually."
 }
 function apacheexporter_install() {
-    sudo useradd --no-create-home --disabled-login --shell /bin/false --gecos "Apache Exporter User" --system apache_exporter
+    sudo useradd --no-create-home --shell /bin/false --comment "Apache Exporter User" --system apache_exporter
+    sudo passwd -l apache_exporter
     cd /tmp/
     VERSION=$(curl https://raw.githubusercontent.com/Lusitaniae/apache_exporter/master/VERSION)
     wget https://github.com/Lusitaniae/apache_exporter/releases/download/v${VERSION}/apache_exporter-${VERSION}.linux-amd64.tar.gz
@@ -168,7 +173,8 @@ EOF
     echo -e "\nThis script doesn't configure SElinux. Please configure SElinux manually."
 }
 function pushgateway_install() {
-    sudo useradd --no-create-home --disabled-login --shell /bin/false --gecos "Push Gateway User" --system pushgateway
+    sudo useradd --no-create-home --shell /bin/false --comment "Push Gateway User" --system pushgateway
+    sudo passwd -l pushgateway
     cd /tmp/
     VERSION=$(curl https://raw.githubusercontent.com/prometheus/pushgateway/master/VERSION)
     wget https://github.com/prometheus/pushgateway/releases/download/v${VERSION}/pushgateway-${VERSION}.linux-amd64.tar.gz
@@ -197,5 +203,38 @@ EOF
     sudo systemctl enable --now pushgateway.service
     sudo rm -rf /tmp/{pushgateway-${VERSION}.linux-amd64.tar.gz,pushgateway-${VERSION}.linux-amd64/}
     firewall-cmd --add-port=9091/tcp --permanent || echo -e "\nfirewall-cmd not available!\nPlease configure linux firewall manually." && firewall-cmd --reload
+    echo -e "\nThis script doesn't configure SElinux. Please configure SElinux manually."
+}
+function blackbox_install() {
+    sudo sudo adduser --no-create-home --shell /bin/false --comment "Blackbox Exporter User" --system blackbox_exporter
+    sudo passwd -l blackbox_exporter
+    cd /tmp/
+    VERSION=$(curl https://raw.githubusercontent.com/prometheus/blackbox_exporter/master/VERSION)
+    wget https://github.com/prometheus/blackbox_exporter/releases/download/v${VERSION}/blackbox_exporter-${VERSION}.linux-amd64.tar.gz
+    tar xvzf blackbox_exporter-${VERSION}.linux-amd64.tar.gz
+    cd blackbox_exporter-${VERSION}.linux-amd64
+    sudo cp blackbox_exporter /usr/local/bin/
+    sudo chown blackbox_exporter:blackbox_exporter /usr/local/bin/blackbox_exporter
+    cat << EOF > blackbox_exporter.service
+[Unit]
+Description=Blackbox Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=blackbox_exporter
+Group=blackbox_exporter
+Type=simple
+ExecStart=/usr/local/bin/blackbox_exporter
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    sudo mv blackbox_exporter.service /etc/systemd/system/blackbox_exporter.service
+    sudo chown root:root /etc/systemd/system/blackbox_exporter.service
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now blackbox_exporter.service
+    sudo rm -rf /tmp/{blackbox_exporter-${VERSION}.linux-amd64.tar.gz,blackbox_exporter-${VERSION}.linux-amd64}
+    firewall-cmd --add-port=9115/tcp --permanent || echo -e "\nfirewall-cmd not available!\nPlease configure linux firewall manually." && firewall-cmd --reload
     echo -e "\nThis script doesn't configure SElinux. Please configure SElinux manually."
 }
