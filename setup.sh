@@ -214,6 +214,47 @@ function blackbox_install() {
     tar xvzf blackbox_exporter-${VERSION}.linux-amd64.tar.gz
     cd blackbox_exporter-${VERSION}.linux-amd64
     sudo cp blackbox_exporter /usr/local/bin/
+    sudo mkdir -p /etc/blackbox_exporter
+    sudo cat << EOF > /etc/blackbox_exporter/blackbox.yml
+modules:
+  http_2xx:
+    prober: http
+    timeout: 180s
+    http:
+      preferred_ip_protocol: "ipv4"
+      valid_status_codes: []
+      method: GET
+  http_post_2xx:
+    prober: http
+    http:
+      method: POST
+  tcp_connect:
+    prober: tcp
+  pop3s_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - expect: "^+OK"
+      tls: true
+      tls_config:
+        insecure_skip_verify: false
+  ssh_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - expect: "^SSH-2.0-"
+  irc_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - send: "NICK prober"
+      - send: "USER prober prober prober :prober"
+      - expect: "PING :([^ ]+)"
+        send: "PONG ${1}"
+      - expect: "^:[^ ]+ 001"
+  icmp:
+    prober: icmp
+EOF
     sudo chown blackbox_exporter:blackbox_exporter /usr/local/bin/blackbox_exporter
     cat << EOF > blackbox_exporter.service
 [Unit]
@@ -225,7 +266,7 @@ After=network-online.target
 User=blackbox_exporter
 Group=blackbox_exporter
 Type=simple
-ExecStart=/usr/local/bin/blackbox_exporter
+ExecStart=/usr/local/bin/blackbox_exporter  --config.file=/etc/blackbox_exporter/blackbox.yml
 
 [Install]
 WantedBy=multi-user.target
